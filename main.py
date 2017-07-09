@@ -3,8 +3,9 @@ import functools
 import os
 import signal
 
-from mcg_radio.playback_controller import PlaybackController
+from mcg_radio.display_controller import DisplayController
 from mcg_radio.buttons_listener import ButtonsListener
+from mcg_radio.playback_controller import PlaybackController
 
 
 class McgRadio:
@@ -19,7 +20,9 @@ class McgRadio:
         self.loop.stop()
 
     def run(self):
-        pc = PlaybackController()
+        dc = DisplayController()
+        dc.setup()
+        pc = PlaybackController(dc)
         btl = ButtonsListener(pc)
 
         try:
