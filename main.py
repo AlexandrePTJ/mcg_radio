@@ -1,41 +1,25 @@
-import asyncio
 import gbulb
-import json
-import signal
+from aiohttp import web
 
-#from mcg_radio.display_controller import DisplayController
+from mcg_radio.fake_display_controller import FakeDisplayController as DisplayController
 #from mcg_radio.buttons_listener import ButtonsListener
 from mcg_radio.playback_controller import PlaybackController
+from mcg_radio.webapp import index
 
+dc = DisplayController()
+dc.setup()
 
-class McgRadio:
+pc = PlaybackController(dc)
+pc.update_radios('radios.json')
+pc.play(1)
 
-    def __init__(self):
-        gbulb.install()
+# btl = ButtonsListener(pc)
 
-    def load_radios(self, radios_json):
-        with open(radios_json) as f:
-            self.radios = json.load(f)
+# GLib and asyncio
+gbulb.install()
 
-    def run(self):
-        #dc = DisplayController()
-        #dc.setup()
-        pc = PlaybackController(None)
-        pc.update_radios(self.radios)
-        pc.play("1")
-        #btl = ButtonsListener(pc)
-
-        loop = asyncio.get_event_loop()
-        loop.add_signal_handler(signal.SIGINT, loop.stop)
-
-        try:
-            loop.run_forever()
-        finally:
-            loop.close()
-            pc.stop()
-
-
-if __name__ == '__main__':
-    mr = McgRadio()
-    mr.load_radios('radios.json')
-    mr.run()
+# WebApp is used as loop.run_forever() bridge
+app = web.Application()
+app.router.add_get('/', index)
+app['PlaybackController'] = pc
+web.run_app(app, host='127.0.0.1', port=8080)
