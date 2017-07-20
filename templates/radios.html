@@ -18,13 +18,17 @@
 <body>
 
 <div class="container">
-	<ul>
+	<form action="/" method="post" accept-charset="utf-8" enctype="application/x-www-form-urlencoded">
 	{% for radio in radios %}
-		<li>{{ radio.url }}</li>
+		<fieldset class="flex two">
+            <legend>{{ radio.index }}</legend>
+            <label><input type="text" placeholder="Label" id="label_{{ radio.index }}" value="{{ radio.label }}"></label>
+            <label><input type="url" placeholder="URL" id="url_{{ radio.index }}" value="{{ radio.url }}"></label>
+        </fieldset>
 	{% endfor %}
-	</ul>
+        <input type="submit" value="Save">
+	</form>
 </div>
 
 </body>
-
 </html>
