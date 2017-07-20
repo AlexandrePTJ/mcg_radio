@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+	<meta charset="utf-8">
+	<title>MCG Radios</title>
+	<link rel="stylesheet" href="static/picnic.min.css">
+</head>
+
+<body>
+
+<ul>
+{% for radio in radios %}
+	<li>{{ radio.url }}</li>
+{% endfor %}
+</ul>
+
+</body>
+
+</html>
