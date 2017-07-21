@@ -22,8 +22,8 @@
 	{% for radio in radios %}
 		<fieldset class="flex two">
             <legend>{{ radio.index }}</legend>
-            <label><input type="text" placeholder="Label" id="label_{{ radio.index }}" value="{{ radio.label }}"></label>
-            <label><input type="url" placeholder="URL" id="url_{{ radio.index }}" value="{{ radio.url }}"></label>
+            <label><input type="text" placeholder="Label" name="label_{{ radio.index }}" value="{{ radio.label }}"></label>
+            <label><input type="url" placeholder="URL" name="url_{{ radio.index }}" value="{{ radio.url }}"></label>
         </fieldset>
 	{% endfor %}
         <input type="submit" value="Save">
