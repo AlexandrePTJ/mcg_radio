@@ -8,7 +8,10 @@ class FakeDisplayController:
         pass
 
     def set_message(self, message):
-        print(message)
+        print("Message: %s"% (message))
+
+    def set_title(self, title):
+        print("Title: %s" % (title))
 
 
 class FakeNuttonsListener:

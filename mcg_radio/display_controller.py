@@ -14,4 +14,7 @@ class DisplayController:
             draw.rectangle(self.device.bounding_box, outline="black", fill="white")
 
     def set_message(self, message):
-        pass
+        print("Message: %s"% (message))
+
+    def set_title(self, title):
+        print("Title: %s" % (title))

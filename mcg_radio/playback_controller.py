@@ -36,6 +36,8 @@ class PlaybackController:
             index = 1
         for radio in self.radios:
             if radio['index'] == index:
+                self.loop.call_soon(
+                    self.display_controller.set_title, radio['label'])
                 self.player.set_property('uri', radio['url'])
                 self.player.set_state(Gst.State.PLAYING)
                 self.current_index = index
