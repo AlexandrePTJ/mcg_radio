@@ -7,8 +7,10 @@ from gi.repository import Gst
 
 class PlaybackController:
 
-    def __init__(self, display_controller):
+    def __init__(self, settings, display_controller):
         Gst.init(None)
+
+        self.settings = settings
 
         self.loop = asyncio.get_event_loop()
         self.display_controller = display_controller
@@ -19,9 +21,8 @@ class PlaybackController:
         bus.add_signal_watch()
         bus.connect('message::tag', self._on_message)
 
-    def update_radios(self, radios_json):
-        with open(radios_json) as f:
-            self.radios = json.load(f)
+        # auto start
+        self.play(self.settings.current_index)
 
     def _on_message(self, bus, message):
         taglist = message.parse_tag()
@@ -34,23 +35,25 @@ class PlaybackController:
     def play(self, index=None):
         if index is None:
             index = 1
-        for radio in self.radios:
+        for radio in self.settings.radios:
             if radio['index'] == index:
                 self.loop.call_soon(
                     self.display_controller.set_title, radio['label'])
                 self.player.set_property('uri', radio['url'])
                 self.player.set_state(Gst.State.PLAYING)
-                self.current_index = index
+
+                self.settings.current_index = index
+                self.settings.save()
 
     def stop(self):
         self.player.set_state(Gst.State.NULL)
 
     def next(self):
-        if self.current_index is not None:
+        if self.settings.current_index:
             self.stop()
-            self.play(self.current_index + 1)
+            self.play(self.settings.current_index + 1)
 
     def previous(self):
-        if self.current_index is not None:
+        if self.settings.current_index:
             self.stop()
-            self.play(self.current_index - 1)
+            self.play(self.settings.current_index - 1)

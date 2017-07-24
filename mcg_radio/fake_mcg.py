@@ -14,7 +14,7 @@ class FakeDisplayController:
         print("Title: %s" % (title))
 
 
-class FakeNuttonsListener:
+class FakeButtonsListener:
     def __init__(self, pin_previous=26, pin_next=19, debounce=0.1):
         pass
 
