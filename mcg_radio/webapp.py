@@ -5,20 +5,16 @@ import jinja2
 
 class RadiosView(web.View):
 
-    MAX_RADIOS = 11
-
     @aiohttp_jinja2.template('radios.html')
     async def get(self):
         radios = self.request.app['PlaybackController'].radios
-        if len(radios) < self.MAX_RADIOS:
-            for idx in range(len(radios) + 1, self.MAX_RADIOS):
-                radios.append({'label': '', 'url': '', 'index': idx})
         return {'radios': radios}
 
     async def post(self):
         data = await self.request.post()
+        radios_count = int(data['radios_count'])
         radios = []
-        for n in range(1, self.MAX_RADIOS):
+        for n in range(1, radios_count + 1):
             lbl_n = data['label_' + str(n)]
             url_n = data['url_' + str(n)]
             if lbl_n and url_n:
