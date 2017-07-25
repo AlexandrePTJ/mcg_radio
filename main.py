@@ -1,36 +1,34 @@
-import asyncio
-import functools
-import os
-import signal
+import gbulb
+from aiohttp import web
 
+from mcg_radio.fake_mcg import FakeDisplayController as DisplayController
+from mcg_radio.fake_mcg import FakeButtonsListener as ButtonsListener
 from mcg_radio.playback_controller import PlaybackController
-from mcg_radio.buttons_listener import ButtonsListener
+from mcg_radio.webapp import make_webapp
+from mcg_radio import Settings
 
 
-class McgRadio:
-    def __init__(self):
-        self.loop = asyncio.get_event_loop()
-        for sign in ('SIGINT', 'SIGTERM'):
-            self.loop.add_signal_handler(getattr(signal, sign),
-                                         functools.partial(self.ask_exit, sign))
+def main():
+    settings = Settings()
+    settings.read()
 
-    def ask_exit(self, signame):
-        print("got signal %s: exit" % signame)
-        self.loop.stop()
+    # Display
+    dc = DisplayController()
+    dc.setup()
 
-    def run(self):
-        pc = PlaybackController()
-        btl = ButtonsListener(pc)
+    # Playback
+    pc = PlaybackController(settings, dc)
 
-        try:
-            print("Event loop running forever, press Ctrl+C to interrupt.")
-            print("pid %s: send SIGINT or SIGTERM to exit." % os.getpid())
-            self.loop.run_forever()
-        finally:
-            self.loop.run_until_complete(self.loop.shutdown_asyncgens())
-            self.loop.close()
+    # User interface
+    btl = ButtonsListener()
+    btl.setup(pc)
+
+    # WebApp is used as loop.run_forever() bridge
+    web.run_app(make_webapp(settings), host='127.0.0.1', port=8080)
 
 
 if __name__ == '__main__':
-    mr = McgRadio()
-    mr.run()
+    # GLib and asyncio
+    gbulb.install()
+    # Application
+    main()

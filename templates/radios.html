@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>MCG Radios</title>
+	<link rel="stylesheet" href="static/picnic.min.css">
+	<style>
+		.container {
+			width:        80%;
+			margin-left:  auto;
+			margin-right: auto;
+		}
+	</style>
+	<script type="text/javascript">
+		function addRadioFields() {
+			var container = document.getElementById('radios_container');
+
+			// Get current count
+			var radios_count = parseInt(document.getElementById('radios_count').value);
+			var next_id = radios_count + 1;
+
+			// Create Legend
+			var lg = document.createElement('legend');
+			lg.innerText = next_id;
+
+			// Create Label input
+			var lblabel = document.createElement('label');
+			var inlabel = document.createElement('input');
+			inlabel.type = "text";
+			inlabel.placeholder = "Label";
+			inlabel.name = "label_" + next_id;
+			lblabel.appendChild(inlabel);
+
+			// Create URL input
+			var lburl = document.createElement('label');
+			var inurl = document.createElement('input');
+			inurl.type = "text";
+			inurl.placeholder = "URL";
+			inurl.name = "url_" + next_id;
+			lburl.appendChild(inurl);
+
+			// Create new fieldset and add elements
+			var fset = document.createElement('fieldset');
+			fset.className = "flex two";
+
+			fset.appendChild(lg);
+			fset.appendChild(lblabel);
+			fset.appendChild(lburl);
+
+            // Add in Form
+			container.appendChild(fset);
+
+			// Update current count
+			document.getElementById('radios_count').value = next_id;
+		}
+	</script>
+</head>
+
+<body>
+
+<div class="container">
+	<form action="/" method="post" accept-charset="utf-8" enctype="application/x-www-form-urlencoded">
+
+        <div id="radios_container">
+	    {% for radio in radios %}
+		    <fieldset class="flex two">
+                <legend>{{ radio.index }}</legend>
+                <label><input type="text" placeholder="Label" name="label_{{ radio.index }}" value="{{ radio.label }}"></label>
+                <label><input type="url" placeholder="URL" name="url_{{ radio.index }}" value="{{ radio.url }}"></label>
+            </fieldset>
+	    {% endfor %}
+        </div>
+        <input type="submit" value="Save">
+        <input id="radios_count" name="radios_count" type="hidden" value="{{ radios|length }}">
+	</form>
+    <input type="button" value="Add Radio" onclick="addRadioFields()">
+</div>
+
+</body>
+</html>
