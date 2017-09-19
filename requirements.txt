@@ -1,5 +1,1 @@
-luma.oled
-gpiozero
-gbulb
-aiohttp
-aiohttp_jinja2
+python-mpd2
