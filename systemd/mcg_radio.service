@@ -1,0 +1,12 @@
+[Unit]
+Description=MCG Radio
+After=multi-user.target
+
+[Service]
+Type=idle
+User=alexandre
+WorkingDirectory=/home/alexandre/devel/mcg/backend
+ExecStart=/home/alexandre/devel/mcg/backend/bin/python main.py
+
+[Install]
+WantedBy=multi-user.target
