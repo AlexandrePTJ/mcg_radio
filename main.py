@@ -2,6 +2,9 @@ import time
 from queue import Queue
 from mpdcontroller import MPDController
 from displaycontroller import DisplayController
+from flask import Flask
+from flask_restful import Api
+from apiproxy import *
 
 
 def main():
@@ -15,8 +18,13 @@ def main():
         m.connect()
         m.start()
 
-        while True:
-            time.sleep(1)
+        app = Flask(__name__)
+        api = Api(app)
+        api.add_resource(Infos, '/infos', resource_class_kwargs={'mpd_controller': m})
+        app.run()
+
+        #while True:
+        #    time.sleep(1)
 
     except (KeyboardInterrupt, SystemExit):
         m.stop()

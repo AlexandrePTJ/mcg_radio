@@ -1,27 +1,21 @@
-from threading import Thread
+from stoppablethread import StoppableThread
 
 
-class DisplayController(Thread):
+class DisplayController(StoppableThread):
 
     _q = None         # Message queue
-    _forever = False  # thread loop
 
     def __init__(self, q):
-        Thread.__init__(self)
+        StoppableThread.__init__(self)
         self._q = q
-        self._forever = False
 
     def run(self):
-        self._forever = True
-        while self._forever:
+        while not self.stopped():
             message = self._q.get()
             if isinstance(message, dict):
                 self._process_dict_message(message)
             elif isinstance(message, str):
                 self._process_string_message(str)
-
-    def stop(self):
-        self._forever = False
 
     def _process_string_message(self, msg):
         if msg == 'quit':

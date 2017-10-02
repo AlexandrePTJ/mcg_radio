@@ -1,24 +1,22 @@
 from mpd import MPDClient
-from threading import Thread
+from stoppablethread import StoppableThread
 
 
-class MPDController(Thread):
+class MPDController(StoppableThread):
 
     _q = None              # Message queue
-    _forever = False       # thread loop
     _client = MPDClient()  # MPD client
     _playlist = {}         # Indexed playlist
 
     def __init__(self, q):
-        Thread.__init__(self)
+        StoppableThread.__init__(self)
         self._q = q
 
     def connect(self, host='localhost', port=6600):
         self._client.connect(host, port)
 
     def run(self):
-        self._forever = True
-        while self._forever:
+        while not self.stopped():
             status = self._client.status()
             if status['state'] != 'play':
                 self._q.put({'station': 'None'})
@@ -33,7 +31,7 @@ class MPDController(Thread):
             self._client.idle()
 
     def stop(self):
-        self._forever = False
+        self._stopper.set()
         self._client._write_command("noidle")
 
     def play(self, id):
@@ -42,3 +40,6 @@ class MPDController(Thread):
 
     def setup(self, playlist):
         self._playlist = playlist
+
+    def infos(self):
+        return "coucou"
