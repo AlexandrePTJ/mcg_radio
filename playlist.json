@@ -1,0 +1,22 @@
+{
+    "1": {
+        "label": "France Info",
+        "url": "http://ice1.somafm.com/7soul-128-mp3"
+    },
+    "12": {
+        "label": "France Inter",
+        "url": "http://direct.franceinfo.fr/live/franceinter-midfi.mp3"
+    },
+    "13": {
+        "label": "RFI Monde",
+        "url": "http://live02.rfi.fr/rfimonde-96k.mp3"
+    },
+    "14": {
+        "label": "Couleur3",
+        "url": "http://stream.srg-ssr.ch/m/couleur3/mp3_128"
+    },
+    "15": {
+        "label": "NRJ",
+        "url": "http://cdn.nrjaudio.fm/audio1/fr/30401/mp3_128.mp3?origine=fluxradios"
+    }
+}

@@ -29,3 +29,5 @@ class DisplayController(StoppableThread):
             print('Message : %s' % msg['name'])
         if 'station' in msg:
             print('Station : %s' % msg['station'])
+        if 'id' in msg:
+            print('ID : %s' % msg['id'])
