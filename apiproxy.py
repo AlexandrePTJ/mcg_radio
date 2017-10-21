@@ -1,4 +1,6 @@
+from flask import request
 from flask_restful import Api, Resource
+import json
 
 
 class RestMpdProxyResource(Resource):
@@ -19,6 +21,11 @@ class Playlist(RestMpdProxyResource):
         super(Playlist, self).__init__(**kwargs)
 
     def get(self):
+        return self._mpdcontroller.playlist()
+
+    def put(self):
+        args = request.form['data']
+        self._mpdcontroller.set_playlist(json.dumps(args))
         return self._mpdcontroller.playlist()
 
 
