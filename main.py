@@ -1,34 +1,36 @@
-import gbulb
-from aiohttp import web
-
-from mcg_radio.fake_mcg import FakeDisplayController as DisplayController
-from mcg_radio.fake_mcg import FakeButtonsListener as ButtonsListener
-from mcg_radio.playback_controller import PlaybackController
-from mcg_radio.webapp import make_webapp
-from mcg_radio import Settings
+from queue import Queue
+from mpdcontroller import MPDController
+from displaycontroller import DisplayController
+from flask import Flask
+from apiproxy import initialize_api
 
 
 def main():
-    settings = Settings()
-    settings.read()
+    try:
+        q = Queue()
 
-    # Display
-    dc = DisplayController()
-    dc.setup()
+        d = DisplayController(q)
+        d.start()
 
-    # Playback
-    pc = PlaybackController(settings, dc)
+        m = MPDController(q)
+        m.reload()
+        m.connect()
+        m.start()
 
-    # User interface
-    btl = ButtonsListener()
-    btl.setup(pc)
+        app = Flask(__name__)
+        initialize_api(app, mpd_controller=m)
+        app.run()
 
-    # WebApp is used as loop.run_forever() bridge
-    web.run_app(make_webapp(settings), host='127.0.0.1', port=8080)
+    except (KeyboardInterrupt, SystemExit):
+        m.stop()
+        d.stop()
+        # will unlock DisplayController
+        q.put('quit')
+
+    finally:
+        m.join(5)
+        d.join(5)
 
 
 if __name__ == '__main__':
-    # GLib and asyncio
-    gbulb.install()
-    # Application
     main()
