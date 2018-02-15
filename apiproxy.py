@@ -45,6 +45,14 @@ class Previous(RestMpdProxyResource):
         return self._mpdcontroller.previous()
 
 
+class Play(RestMpdProxyResource):
+    def __init__(self, **kwargs):
+        super(Play, self).__init__(**kwargs)
+
+    def get(self, pid):
+        return self._mpdcontroller.play(pid)
+
+
 def initialize_api(app, mpd_controller):
     kw = {'mpd_controller': mpd_controller}
     api = Api(app)
@@ -52,3 +60,4 @@ def initialize_api(app, mpd_controller):
     api.add_resource(Playlist, '/playlist', resource_class_kwargs=kw)
     api.add_resource(Next, '/next', resource_class_kwargs=kw)
     api.add_resource(Previous, '/previous', resource_class_kwargs=kw)
+    api.add_resource(Play, '/play/<pid>', resource_class_kwargs=kw)
