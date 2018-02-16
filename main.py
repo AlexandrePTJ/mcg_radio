@@ -6,30 +6,29 @@ from apiproxy import initialize_api
 
 
 def main():
-    try:
-        q = Queue()
+    q = Queue()
 
-        d = DisplayController(q)
-        d.start()
+    d = DisplayController(q)
+    d.start()
 
-        m = MPDController(q)
-        m.reload()
-        m.connect()
-        m.start()
+    m = MPDController(q)
+    m.reload()
+    m.connect()
+    m.start()
 
-        app = Flask(__name__)
-        initialize_api(app, mpd_controller=m)
-        app.run()
+    app = Flask(__name__)
+    initialize_api(app, mpd_controller=m)
+    app.run(debug=True, threaded=True)
 
-    except (KeyboardInterrupt, SystemExit):
-        m.stop()
-        d.stop()
-        # will unlock DisplayController
-        q.put('quit')
+    m.stop()
+    d.stop()
+    # will unlock DisplayController
+    q.put('quit')
 
-    finally:
-        m.join(5)
-        d.join(5)
+    m.join()
+    print("MPDController joined")
+    d.join()
+    print("DisplayController joined")
 
 
 if __name__ == '__main__':

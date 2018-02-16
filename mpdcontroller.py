@@ -1,12 +1,12 @@
 import json
 import os.path
 from mpd import MPDClient
-from stoppablethread import StoppableThread
+#from stoppablethread import StoppableThread
 import time
-from threading import Event
+from threading import Event, Thread
 
 
-class MPDController(StoppableThread):
+class MPDController(Thread):
 
     _q = None              # Message queue
     _client = MPDClient()  # MPD client
@@ -20,13 +20,19 @@ class MPDController(StoppableThread):
     _current_station_id = '1'
     _conf_dir = '/home/alexandre/devel/mcg/backend'
     _mpdbusy = Event()     # Do no go idle while sending other cmds
+    _connected = False
+    _stopper = Event()
 
     def __init__(self, q):
-        StoppableThread.__init__(self)
+        super(MPDController, self).__init__()
         self._q = q
 
     def connect(self, host='localhost', port=6600):
-        self._client.connect(host, port)
+        try:
+            self._client.connect(host, port)
+            self._connected = True
+        except ConnectionError as ce:
+            pass
 
     def reload(self):
         # playlist
@@ -48,7 +54,11 @@ class MPDController(StoppableThread):
         self.play(self._current_station_id)
 
         # Looping
-        while not self.stopped():
+        while not self._stopper.is_set():
+            if not self._connected:
+                time.sleep(1)
+                continue
+
             status = self._client.status()
             if status['state'] != 'play':
                 self._infos['station'] = 'None'
@@ -68,9 +78,14 @@ class MPDController(StoppableThread):
 
     def stop(self):
         self._stopper.set()
-        self._client._write_command("noidle")
+        if self._connected:
+            self._client._write_command("noidle")
+            self._connected = False
 
     def play(self, id):
+        if not self._connected:
+            return
+
         if id in self._playlist:
             station = self._playlist[id]
 
@@ -88,6 +103,9 @@ class MPDController(StoppableThread):
             self._mpdbusy.clear()
 
     def next(self):
+        if not self._connected:
+            return
+
         cidx = int(self._current_station_id)
         next_found = False
         while not next_found and cidx < 100:
@@ -98,6 +116,9 @@ class MPDController(StoppableThread):
             self.play(str(cidx))
 
     def previous(self):
+        if not self._connected:
+            return
+
         cidx = int(self._current_station_id)
         previous_found = False
         while not previous_found and cidx > 0:
