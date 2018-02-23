@@ -1,2 +1,1 @@
 python-mpd2
-flask_restful

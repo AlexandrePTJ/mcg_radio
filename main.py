@@ -1,24 +1,34 @@
+#coding: utf-8
+
 from queue import Queue
+from http.server import BaseHTTPRequestHandler, HTTPServer
+
 from mpdcontroller import MPDController
 from displaycontroller import DisplayController
-from flask import Flask
-from apiproxy import initialize_api
+from dbaccess import DBAccess
 
 
 def main():
+    dba = DBAccess("../mcg_radio.db")
     q = Queue()
 
     d = DisplayController(q)
     d.start()
 
-    m = MPDController(q)
-    m.reload()
+    m = MPDController(q, dba)
     m.connect()
     m.start()
 
-    app = Flask(__name__)
-    initialize_api(app, mpd_controller=m)
-    app.run(debug=True, threaded=True)
+    class PlayStationHandler(BaseHTTPRequestHandler):
+
+        def do_GET(self):
+            if self.path == '/play':
+                self.send_response(200)
+            else:
+                self.send_error(404)
+
+    httpd = HTTPServer(('', 5000), PlayStationHandler)
+    httpd.serve_forever()
 
     m.stop()
     d.stop()
