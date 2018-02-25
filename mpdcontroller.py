@@ -1,5 +1,5 @@
-import json
-import os.path
+# coding: utf-8
+
 from mpd import MPDClient
 import time
 from threading import Event, Thread
@@ -14,7 +14,6 @@ class MPDController(Thread):
         'name': '',
         'position': ''
     }
-    _conf_dir = '/home/alexandre/devel/mcg/backend'
     _mpdbusy = Event()     # Do no go idle while sending other cmds
     _connected = False
     _stopper = Event()
@@ -33,9 +32,8 @@ class MPDController(Thread):
 
     def run(self):
         # Get station to play and send it to mpd
-        current_info = self._dba.get_current_info()
-        if current_info:
-            self.play(current_info['stationId'])
+        station = self._dba.get_current_station()
+        self.play(station)
 
         # Looping
         while not self._stopper.is_set():
@@ -71,19 +69,18 @@ class MPDController(Thread):
             self._client._write_command("noidle")
             self._connected = False
 
-    def play(self, id):
+    def play(self, station):
         if not self._connected:
             return
 
-        station = self._dba.get_station_by_id(id)
         if station:
             self._dba.clear_current_info()
-            self._dba.set_current_station(station['id'])
+            self._dba.set_current_station(station)
             self._infos['position'] = str(station['position'])
 
             self._mpdbusy.set()
             self._client._write_command("noidle")
             self._client.clear()
-            self._client.add(station['url'])
+            self._client.add(station['stream_url'])
             self._client.play()
             self._mpdbusy.clear()

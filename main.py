@@ -1,7 +1,8 @@
-#coding: utf-8
+# coding: utf-8
 
 from queue import Queue
 from http.server import BaseHTTPRequestHandler, HTTPServer
+import re
 
 from mpdcontroller import MPDController
 from displaycontroller import DisplayController
@@ -22,14 +23,26 @@ def main():
     class PlayStationHandler(BaseHTTPRequestHandler):
 
         def do_GET(self):
-            if self.path == '/play':
-                self.send_response(200)
-            else:
+            res = re.match("^/play\?(pos|id)=(\d+)$", self.path)
+            if res is None:
                 self.send_error(404)
 
-    httpd = HTTPServer(('', 5000), PlayStationHandler)
-    httpd.serve_forever()
+            val = int(res.group(2))
+            if res.group(1) == "pos":
+                station = dba.get_station_by_position(val)
+            else:
+                station = dba.get_station_by_id(val)
+            m.play(station)
 
+            self.send_response(200)
+
+    httpd = HTTPServer(('', 5000), PlayStationHandler)
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        pass
+
+    httpd.server_close()
     m.stop()
     d.stop()
     # will unlock DisplayController

@@ -1,6 +1,7 @@
-#coding: utf-8
+# coding: utf-8
 
 from sqlite3 import dbapi2 as sqlite3
+
 
 class DBAccess(object):
 
@@ -27,12 +28,13 @@ class DBAccess(object):
         db.close()
         return station
 
-    def get_current_info(self):
+    def get_current_station(self):
         db = self._get_db()
-        cur = db.execute("SELECT * FROM current_info")
-        current_info = cur.fetchone()
+        cur = db.execute("SELECT stations.* FROM stations"
+                         " JOIN current_info WHERE stations.id=current_info.station_id")
+        station = cur.fetchone()
         db.close()
-        return current_info
+        return station
 
     def clear_current_info(self):
         db = self._get_db()
@@ -40,9 +42,9 @@ class DBAccess(object):
         db.commit()
         db.close()
 
-    def set_current_station(self, stationId):
+    def set_current_station(self, station):
         db = self._get_db()
-        db.execute("INSERT INTO current_info (station_id) VALUES(?)", str(stationId))
+        db.execute("INSERT INTO current_info(station_id) VALUES(?)", (str(station['id']),))
         db.commit()
         db.close()
 
