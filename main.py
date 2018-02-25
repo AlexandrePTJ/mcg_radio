@@ -34,7 +34,10 @@ def main():
                 station = dba.get_station_by_id(val)
             m.play(station)
 
-            self.send_response(200)
+            self.send_response_only(200)
+            self.send_header("Content-type", "text/html")
+            self.end_headers()
+            self.wfile.write("<html><body>OK</body></html")
 
     httpd = HTTPServer(('', 5000), PlayStationHandler)
     try:

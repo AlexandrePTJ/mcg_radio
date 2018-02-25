@@ -16,14 +16,14 @@ class DBAccess(object):
 
     def get_station_by_position(self, position):
         db = self._get_db()
-        cur = db.execute("SELECT * FROM stations WHERE position=?", str(position))
+        cur = db.execute("SELECT * FROM stations WHERE position=?", (str(position),))
         station = cur.fetchone()
         db.close()
         return station
 
     def get_station_by_id(self, id):
         db = self._get_db()
-        cur = db.execute("SELECT * FROM stations WHERE id=?", str(id))
+        cur = db.execute("SELECT * FROM stations WHERE id=?", (str(id),))
         station = cur.fetchone()
         db.close()
         return station
