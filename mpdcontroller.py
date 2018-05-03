@@ -3,6 +3,7 @@
 from mpd import MPDClient
 import time
 from threading import Event, Thread
+import requests
 
 
 class MPDController(Thread):
@@ -70,17 +71,28 @@ class MPDController(Thread):
             self._connected = False
 
     def play(self, station):
-        if not self._connected:
-            return
-
         if station:
             self._dba.clear_current_info()
             self._dba.set_current_station(station)
             self._infos['position'] = str(station['position'])
 
-            self._mpdbusy.set()
-            self._client._write_command("noidle")
-            self._client.clear()
-            self._client.add(station['stream_url'])
-            self._client.play()
-            self._mpdbusy.clear()
+            stream = self._extract_stream(station['stream_url'])
+
+            if self._connected:
+                self._mpdbusy.set()
+                self._client._write_command("noidle")
+                self._client.clear()
+                self._client.add(stream)
+                self._client.play()
+                self._mpdbusy.clear()
+
+    ''' Because TuneIn can send .m3u instead of real stream '''
+    def _extract_stream(self, dbstream):
+        if dbstream.endswith('.m3u'):
+            r = requests.get(dbstream, allow_redirects=True)
+            for l in r.text.splitlines():
+                if not l.startswith("#"):
+                    return l
+            return ""
+        else:
+            return dbstream
