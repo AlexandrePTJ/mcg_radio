@@ -1,12 +1,13 @@
 # coding: utf-8
 
+import cherrypy
 from queue import Queue
-from http.server import BaseHTTPRequestHandler, HTTPServer
 import re
 
-from mpdcontroller import MPDController
-from displaycontroller import DisplayController
 from dbaccess import DBAccess
+from displaycontroller import DisplayController
+from mpdcontroller import MPDController
+from restapp import RestApp
 
 
 def main():
@@ -20,30 +21,12 @@ def main():
     m.connect()
     m.start()
 
-    class PlayStationHandler(BaseHTTPRequestHandler):
-
-        def do_GET(self):
-            res = re.match("^/play\?(pos|id)=(\d+)$", self.path)
-            if res is None:
-                self.send_error(404)
-
-            val = int(res.group(2))
-            if res.group(1) == "pos":
-                station = dba.get_station_by_position(val)
-            else:
-                station = dba.get_station_by_id(val)
-            m.play(station)
-
-            self.send_response_only(200)
-            self.end_headers()
-
-    httpd = HTTPServer(('', 5000), PlayStationHandler)
     try:
-        httpd.serve_forever()
+        cherrypy.config.update({'engine.autoreload.on': True})
+        cherrypy.quickstart(RestApp(m, dba))
     except KeyboardInterrupt:
         pass
 
-    httpd.server_close()
     m.stop()
     d.stop()
     # will unlock DisplayController
