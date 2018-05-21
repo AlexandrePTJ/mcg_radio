@@ -86,6 +86,22 @@ class MPDController(Thread):
                 self._client.play()
                 self._mpdbusy.clear()
 
+    def direct_play(self, url):
+        if not self._connected:
+            return
+
+        self._dba.clear_current_info()
+        self._dba.set_current_station({'id': -1})
+        self._infos['position'] = "-1"
+
+        stream = self._extract_stream(url)
+        self._mpdbusy.set()
+        self._client._write_command("noidle")
+        self._client.clear()
+        self._client.add(stream)
+        self._client.play()
+        self._mpdbusy.clear()
+
     ''' Because TuneIn can send .m3u instead of real stream '''
     def _extract_stream(self, dbstream):
         if dbstream.endswith('.m3u'):

@@ -23,6 +23,7 @@ def main():
 
     try:
         cherrypy.config.update({'engine.autoreload.on': True})
+        cherrypy.config.update({'server.socket_port': 5000})
         cherrypy.quickstart(RestApp(m, dba))
     except KeyboardInterrupt:
         pass

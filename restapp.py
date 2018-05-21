@@ -10,10 +10,12 @@ class RestApp(object):
         self._dba = dba
 
     @cherrypy.expose
-    def play(self, pos=-1, id=-1):
-        if int(pos) > -1:
+    def play(self, pos=None, id=None, url=None):
+        if pos is not None:
             station = self._dba.get_station_by_position(pos)
             self._mpdctrl.play(station)
-        elif int(station) > -1:
+        elif id is not None:
             station = self._dba.get_station_by_id(id)
             self._mpdctrl.play(station)
+        elif url is not None:
+            self._mpdctrl.direct_play(url)
