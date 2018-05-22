@@ -2,8 +2,8 @@
 
 import cherrypy
 from queue import Queue
-import re
 
+from buttonslistener import ButtonsListener
 from dbaccess import DBAccess
 from displaycontroller import DisplayController
 from mpdcontroller import MPDController
@@ -20,6 +20,9 @@ def main():
     m = MPDController(q, dba)
     m.connect()
     m.start()
+
+    bl = ButtonsListener()
+    bl.setup()
 
     try:
         cherrypy.config.update({'engine.autoreload.on': True})
