@@ -19,3 +19,7 @@ class RestApp(object):
             self._mpdctrl.play(station)
         elif url is not None:
             self._mpdctrl.direct_play(url)
+
+    @cherrypy.expose
+    def setvolume(self, v):
+        self._mpdctrl.set_volume(v)

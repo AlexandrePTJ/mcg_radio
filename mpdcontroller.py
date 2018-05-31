@@ -104,6 +104,11 @@ class MPDController(Thread):
         self._client.play()
         self._mpdbusy.clear()
 
+    def set_volume(self, v):
+        if not self._connected:
+            return
+        self._client.setvol(v)
+
     ''' Because TuneIn can send .m3u instead of real stream '''
     def _extract_stream(self, dbstream):
         if dbstream.endswith('.m3u'):
