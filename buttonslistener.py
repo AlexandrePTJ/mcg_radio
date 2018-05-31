@@ -1,4 +1,12 @@
-from gpiozero import Button
+# Be able to create a fake button class for dev
+try:
+    from gpiozero import Button
+except ImportError:
+    class Button(object):
+        def __init__(self, pin=0, pull_up=True, hold_time=0, bounce_time=0.0):
+            super(Button, self).__init__()
+
+
 import os
 
 
