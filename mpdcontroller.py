@@ -83,6 +83,7 @@ class MPDController(Thread):
                 self._client._write_command("noidle")
                 self._client.clear()
                 self._client.add(stream)
+                self._client.setvol(station['volume'])
                 self._client.play()
                 self._mpdbusy.clear()
 
@@ -99,6 +100,7 @@ class MPDController(Thread):
         self._client._write_command("noidle")
         self._client.clear()
         self._client.add(stream)
+        self._client.setvol(80)
         self._client.play()
         self._mpdbusy.clear()
 
