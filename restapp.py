@@ -1,5 +1,6 @@
 # coding: utf-8
 
+import subprocess
 import cherrypy
 
 
@@ -23,3 +24,7 @@ class RestApp(object):
     @cherrypy.expose
     def setvolume(self, v):
         self._mpdctrl.set_volume(v)
+
+    @cherrypy.expose
+    def shutdown(self):
+        subprocess.run(["sudo poweroff"])
