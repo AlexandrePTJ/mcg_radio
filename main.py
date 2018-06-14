@@ -22,7 +22,7 @@ def main():
     m.start()
 
     bl = ButtonsListener()
-    bl.setup()
+    bl.setup(m, dba)
 
     try:
         cherrypy.config.update({'engine.autoreload.on': True})

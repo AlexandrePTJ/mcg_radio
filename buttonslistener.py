@@ -27,22 +27,25 @@ class ButtonsListener:
         self.bt_9 = Button(pin_9, True, debounce)
         self.bt_off = Button(pin=pin_off, pull_up=True, hold_time=2, bounce_time=debounce)
 
-    def setup(self):
+    def setup(self, mpdcontroller, dba):
+        self._mpdcontroller = mpdcontroller
+        self._dba = dba
         #self.btPrev.when_pressed = playback_controller.previous
         #self.btNext.when_pressed = playback_controller.next
         self.bt_1.when_pressed = partial(self._play, pos=1)
-        self.bt_2.when_pressed = lambda: self._play(pos=2)
-        #self.bt_3.when_pressed = playback_controller.play3
-        #self.bt_4.when_pressed = playback_controller.play4
-        #self.bt_5.when_pressed = playback_controller.play5
-        #self.bt_6.when_pressed = playback_controller.play6
-        #self.bt_7.when_pressed = playback_controller.play7
-        #self.bt_8.when_pressed = playback_controller.play8
-        #self.bt_9.when_pressed = playback_controller.play9
+        self.bt_2.when_pressed = partial(self._play, pos=2)
+        self.bt_3.when_pressed = partial(self._play, pos=3)
+        self.bt_4.when_pressed = partial(self._play, pos=4)
+        self.bt_5.when_pressed = partial(self._play, pos=5)
+        self.bt_6.when_pressed = partial(self._play, pos=6)
+        self.bt_7.when_pressed = partial(self._play, pos=7)
+        self.bt_8.when_pressed = partial(self._play, pos=8)
+        self.bt_9.when_pressed = partial(self._play, pos=9)
         self.bt_off.when_pressed = self._shutdown
 
     def _shutdown(self):
         check_call(['sudo', 'poweroff'])
 
-    def _play(self, pos):
-        print("Play %i pressed", pos)
+    def _play(self, pos=0):
+        station = self._dba.get_station_by_position(pos)
+        self._mpdcontroller.play(station)
