@@ -1,6 +1,6 @@
 # coding: utf-8
 
-import os
+from subprocess import check_call
 import cherrypy
 
 
@@ -27,4 +27,4 @@ class RestApp(object):
 
     @cherrypy.expose
     def shutdown(self):
-        os.system("sudo shutdown -h now")
+        check_call(['sudo', 'poweroff'])
